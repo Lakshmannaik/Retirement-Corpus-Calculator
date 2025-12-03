@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirement Calculator (India)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            padding: 40px 20px;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-inputs { grid-template-columns: 1fr; }
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: #e67e22; /* Changed to an orange/warm tone */
+            outline: none;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #34495e;
+        }
+
+        .btn-secondary {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: none; /* Hidden by default */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d35400;
+        }
+
+        /* Result Section */
+        .result-box {
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: #fff3e0; /* Warm background */
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ffe0b2;
+            display: none;
+        }
+
+        .result-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #d35400;
+            display: block;
+            margin-top: 10px;
+        }
+
+        /* Table Section */
+        .table-container {
+            margin-top: 2rem;
+            overflow-x: auto;
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: right;
+        }
+        
+        th:first-child { text-align: center; }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+            font-family: 'Courier New', Courier, monospace; /* Monospace for numbers alignment */
+            font-weight: 600;
+        }
+        
+        td:first-child { 
+            text-align: center; 
+            font-family: sans-serif;
+            color: #7f8c8d;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Retirement Corpus Calculator</h2>
+        
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>Yearly Expenses (After Tax)</label>
+                <input type="number" id="expense" placeholder="e.g. 1200000"> 
+            </div>
+
+            <div class="input-group">
+                <label>Years of Retirement (t)</label>
+                <input type="number" id="years" placeholder="e.g. 25">
+            </div>
+
+            <div class="input-group">
+                <label>Expected Rate of Return (%)</label>
+                <input type="number" id="rate" placeholder="e.g. 8" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label>Expected Inflation Rate (%)</label>
+                <input type="number" id="inflation" value="6" step="0.1">
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="calculateCorpus()">Calculate Corpus</button>
+
+        <div id="resultBox" class="result-box">
+            <span>You require a retirement corpus of:</span>
+            <span id="outputValue" class="result-value">₹0</span>
+            <div style="margin-top: 5px; font-size: 0.9em; color: #777;" id="outputWords"></div>
+            
+            <button id="showScheduleBtn" class="btn-secondary" onclick="showSchedule()">View Year-wise Schedule</button>
+        </div>
+
+        <div id="tableContainer" class="table-container">
+            <h3>Retirement Schedule</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+                Breakdown of how your corpus depletes while accounting for inflation and returns.
+            </p>
+            <table id="breakdownTable">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Opening Balance</th>
+                        <th>+ Return</th>
+                        <th>- Withdrawal</th>
+                        <th>Closing Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Store variables globally so we can use them in the second step (schedule)
+        let globalExpense, globalT, globalR, globalI, globalCorpus;
+
+        function toIndianCurrency(num) {
+            return num.toLocaleString('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            });
+        }
+
+        function calculateCorpus() {
+            // 1. Reset Views
+            document.getElementById('tableContainer').style.display = 'none';
+            document.getElementById('showScheduleBtn').style.display = 'none';
+
+            // 2. Get Inputs
+            globalExpense = parseFloat(document.getElementById('expense').value);
+            globalT = parseFloat(document.getElementById('years').value);
+            const rPercent = parseFloat(document.getElementById('rate').value);
+            const iPercent = parseFloat(document.getElementById('inflation').value);
+
+            if (isNaN(globalExpense) || isNaN(globalT) || isNaN(rPercent) || isNaN(iPercent)) {
+                alert("Please enter valid numbers in all fields.");
+                return;
+            }
+
+            globalR = rPercent / 100;
+            globalI = iPercent / 100;
+
+            // 3. Validate
+            if (Math.abs((1 + globalR) - (1 + globalI)) < 0.00001) {
+                alert("Return Rate and Inflation Rate cannot be exactly the same.");
+                return;
+            }
+
+            // 4. Calculate Corpus
+            const numerator = globalExpense * (1 - Math.pow((1 + globalI) / (1 + globalR), globalT));
+            const denominator = (1 + globalR) - (1 + globalI);
+            globalCorpus = numerator / denominator;
+
+            // 5. Display Result
+            document.getElementById('outputValue').innerText = toIndianCurrency(globalCorpus);
+            
+            // Optional: Helper text for Crores/Lakhs
+            let wordText = "";
+            if(globalCorpus >= 10000000) {
+                wordText = `(Approx. ${(globalCorpus/10000000).toFixed(2)} Crores)`;
+            } else if (globalCorpus >= 100000) {
+                wordText = `(Approx. ${(globalCorpus/100000).toFixed(2)} Lakhs)`;
+            }
+            document.getElementById('outputWords').innerText = wordText;
+
+            document.getElementById('resultBox').style.display = 'block';
+            
+            // Show the "View Schedule" button now that we have a result
+            document.getElementById('showScheduleBtn').style.display = 'inline-block';
+        }
+
+        function showSchedule() {
+            const tableBody = document.querySelector('#breakdownTable tbody');
+            tableBody.innerHTML = ''; // Clear previous
+            
+            let currentBalance = globalCorpus;
+            let currentExpense = globalExpense;
+
+            for (let year = 1; year <= globalT; year++) {
+                const opening = currentBalance;
+                
+                // Growth
+                const growth = opening * globalR;
+                
+                // Expense logic: Year 1 is the base expense. Year 2+ increases by inflation.
+                if (year > 1) {
+                    currentExpense = currentExpense * (1 + globalI);
+                }
+
+                // Balance
+                const closing = opening + growth - currentExpense;
+
+                // Create Row
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year}</td>
+                    <td>${toIndianCurrency(opening)}</td>
+                    <td style="color: green;">${toIndianCurrency(growth)}</td>
+                    <td style="color: #c0392b;">${toIndianCurrency(currentExpense)}</td>
+                    <td style="font-weight:bold;">${toIndianCurrency(Math.max(0, closing))}</td>
+                `;
+                tableBody.appendChild(row);
+
+                currentBalance = closing;
+            }
+
+            // Reveal the table
+            document.getElementById('tableContainer').style.display = 'block';
+            
+            // Optional: scroll to the table
+            document.getElementById('tableContainer').scrollIntoView({behavior: "smooth"});
+        }
+    </script>
+</body>
+</html>
