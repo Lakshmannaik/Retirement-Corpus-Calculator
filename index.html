@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retirement Calculator (India)</title>
     
-    <!-- FONTS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <!-- PDF LIBRARY -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         /* BASE STYLES */
@@ -64,19 +62,12 @@
             margin: 0 8px;
         }
 
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
 
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: #ccc;
             transition: .4s;
             border-radius: 20px;
@@ -85,22 +76,15 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
 
-        input:checked + .slider {
-            background-color: #2e7d32;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
+        input:checked + .slider { background-color: #2e7d32; }
+        input:checked + .slider:before { transform: translateX(20px); }
 
         /* INPUT GRID */
         .grid-inputs {
@@ -109,9 +93,7 @@
             gap: 20px;
         }
 
-        .input-group {
-            margin-bottom: 0.5rem;
-        }
+        .input-group { margin-bottom: 0.5rem; }
 
         label {
             display: block;
@@ -133,15 +115,12 @@
             -webkit-appearance: none;
         }
 
-        input[type="number"]:focus {
-            border-color: #43a047;
-            outline: none;
-        }
+        input[type="number"]:focus { border-color: #43a047; outline: none; }
 
-        /* ACTION BUTTONS GRID */
+        /* ACTION BUTTONS */
         .action-buttons {
             display: grid;
-            grid-template-columns: 3fr 1fr; /* Calculate is bigger */
+            grid-template-columns: 3fr 1fr; 
             gap: 15px;
             margin-top: 1.5rem;
         }
@@ -159,7 +138,6 @@
             transition: background 0.3s;
             box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
         }
-
         .btn-primary:hover { background-color: #1b5e20; }
 
         .btn-reset {
@@ -174,16 +152,13 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .btn-reset:hover { background-color: #cfd8dc; color: #37474f; }
 
-        /* RESULT AREA BUTTONS */
+        /* RESULT AREA */
         .result-actions {
             display: flex;
             justify-content: center;
-            gap: 15px;
             margin-top: 1rem;
-            flex-wrap: wrap;
         }
 
         .btn-secondary {
@@ -196,25 +171,11 @@
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s;
+            width: 100%;
+            max-width: 300px;
         }
-        
         .btn-secondary:hover { background-color: #2e7d32; }
 
-        .btn-pdf {
-            background-color: #d32f2f; /* Red for PDF */
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-pdf:hover { background-color: #b71c1c; }
-
-        /* RESULT BOX */
         .result-box {
             margin-top: 2rem;
             padding: 1.5rem;
@@ -235,6 +196,19 @@
             font-variant-numeric: tabular-nums; 
         }
 
+        /* GRAPH SECTION */
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 2rem;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
         /* TABLE SECTION */
         .table-container {
             margin-top: 2rem;
@@ -242,11 +216,7 @@
             animation: fadeIn 0.5s;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
 
         th {
             background-color: #1b5e20;
@@ -267,29 +237,21 @@
             color: #333;
         }
         
-        td:first-child { 
-            text-align: center; 
-            font-weight: 700;
-            color: #555;
-        }
-
+        td:first-child { text-align: center; font-weight: 700; color: #555; }
         tr:nth-child(even) { background-color: #f9fbe7; }
 
-        /* MOBILE RESPONSIVE STYLES */
+        /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 1.5rem 1rem; }
             .grid-inputs { grid-template-columns: 1fr; gap: 10px; }
-            
-            /* Stack buttons on mobile */
             .action-buttons { grid-template-columns: 1fr; }
-            .result-actions { flex-direction: column; }
-            .btn-secondary, .btn-pdf { width: 100%; }
-
             h2 { font-size: 1.5rem; }
             .result-value { font-size: 1.8rem; }
+            
+            .chart-wrapper { height: 250px; } /* Smaller chart on mobile */
 
-            /* Card View for Mobile Table */
+            /* Card View for Mobile */
             table, thead, tbody, th, td, tr { display: block; }
             thead tr { position: absolute; top: -9999px; left: -9999px; }
             
@@ -300,36 +262,25 @@
                 background: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             }
-
             td:first-child {
                 background-color: #e8f5e9;
                 color: #1b5e20;
                 text-align: left;
                 padding: 10px 15px;
                 border-bottom: 1px solid #c8e6c9;
-                font-weight: 700;
             }
             
+            td:first-child::before { display: none; }
+
             td { 
-                border: none;
-                border-bottom: 1px solid #eee; 
-                position: relative;
-                padding-left: 50%; 
-                text-align: right;
+                border: none; border-bottom: 1px solid #eee; 
+                position: relative; padding-left: 50%; text-align: right;
             }
-
             td:last-child { border-bottom: none; }
-
             td::before { 
-                position: absolute;
-                top: 14px;
-                left: 15px;
-                width: 45%; 
-                white-space: nowrap;
-                text-align: left;
-                font-weight: 500;
-                color: #777;
-                content: attr(data-label);
+                position: absolute; top: 14px; left: 15px; width: 45%; 
+                white-space: nowrap; text-align: left; font-weight: 500; 
+                color: #777; content: attr(data-label);
             }
         }
 
@@ -341,7 +292,7 @@
 </head>
 <body>
 
-    <div class="container" id="printableArea">
+    <div class="container">
         <h2>Retirement Corpus Calculator</h2>
         
         <div class="grid-inputs">
@@ -376,7 +327,7 @@
             </div>
         </div>
 
-        <div class="action-buttons" data-html2canvas-ignore="true">
+        <div class="action-buttons">
             <button class="btn-primary" onclick="calculateCorpus()">Calculate Corpus</button>
             <button class="btn-reset" onclick="resetForm()">Reset</button>
         </div>
@@ -386,14 +337,18 @@
             <span id="outputValue" class="result-value">₹0</span>
             <div style="margin-top: 5px; font-size: 0.9em; color: #558b2f;" id="outputWords"></div>
             
-            <div class="result-actions" data-html2canvas-ignore="true">
-                <button id="showScheduleBtn" class="btn-secondary" onclick="showSchedule()">View Schedule</button>
-                <button id="downloadPdfBtn" class="btn-pdf" onclick="downloadPDF()">Download Report</button>
+            <div class="result-actions">
+                <button id="showScheduleBtn" class="btn-secondary" onclick="showSchedule()">View Year-wise Schedule</button>
             </div>
         </div>
 
         <div id="tableContainer" class="table-container">
             <h3>Retirement Schedule</h3>
+            
+            <div class="chart-wrapper">
+                <canvas id="corpusChart"></canvas>
+            </div>
+
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
                 Breakdown of how your corpus depletes while accounting for inflation and returns.
             </p>
@@ -408,8 +363,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- JS will insert rows here -->
-                </tbody>
+                    </tbody>
             </table>
         </div>
     </div>
@@ -417,6 +371,7 @@
     <script>
         let globalExpense, globalT, globalR, globalI, globalCorpus;
         let isMonthlyMode = false;
+        let myChart = null; // To store chart instance
 
         function toIndianCurrency(num) {
             return num.toLocaleString('en-IN', {
@@ -430,9 +385,7 @@
             const toggle = document.getElementById('expenseToggle');
             const label = document.getElementById('expenseLabel');
             const input = document.getElementById('expense');
-            
             isMonthlyMode = toggle.checked;
-
             if (isMonthlyMode) {
                 label.innerText = "Monthly Expenses (After Tax)";
                 input.placeholder = "e.g. 100000";
@@ -443,28 +396,24 @@
         }
 
         function resetForm() {
-            // Clear inputs
             document.getElementById('expense').value = '';
             document.getElementById('years').value = '';
             document.getElementById('rate').value = '';
-            document.getElementById('inflation').value = '6'; // Default back to 6
-            
-            // Reset Toggle
+            document.getElementById('inflation').value = '6';
             document.getElementById('expenseToggle').checked = false;
-            toggleExpenseMode(); // Reset text to Yearly
-
-            // Hide results
+            toggleExpenseMode();
             document.getElementById('resultBox').style.display = 'none';
             document.getElementById('tableContainer').style.display = 'none';
-            
-            // Clear table
             document.querySelector('#breakdownTable tbody').innerHTML = '';
+            
+            if (myChart) {
+                myChart.destroy();
+                myChart = null;
+            }
         }
 
         function calculateCorpus() {
-            // Hide previous results first
             document.getElementById('tableContainer').style.display = 'none';
-
             let rawExpense = parseFloat(document.getElementById('expense').value);
             globalT = parseFloat(document.getElementById('years').value);
             const rPercent = parseFloat(document.getElementById('rate').value);
@@ -475,9 +424,7 @@
                 return;
             }
 
-            // Convert Monthly to Yearly if toggle is checked
             globalExpense = isMonthlyMode ? rawExpense * 12 : rawExpense;
-
             globalR = rPercent / 100;
             globalI = iPercent / 100;
 
@@ -510,20 +457,24 @@
             let currentBalance = globalCorpus;
             let currentExpense = globalExpense;
 
+            // Arrays for Graph
+            let labels = [];
+            let dataPoints = [];
+
+            // Add Initial Point (Year 0)
+            labels.push("Year 0");
+            dataPoints.push(globalCorpus);
+
             for (let year = 1; year <= globalT; year++) {
                 const opening = currentBalance;
                 const growth = opening * globalR;
-                
-                if (year > 1) {
-                    currentExpense = currentExpense * (1 + globalI);
-                }
-
+                if (year > 1) { currentExpense = currentExpense * (1 + globalI); }
                 const closing = opening + growth - currentExpense;
 
+                // Add to Table
                 const row = document.createElement('tr');
-                
                 row.innerHTML = `
-                    <td data-label="Year">${year}</td>
+                    <td data-label="Year">Year ${year}</td>
                     <td data-label="Opening Balance">${toIndianCurrency(opening)}</td>
                     <td data-label="+ Return" style="color: #2e7d32;">${toIndianCurrency(growth)}</td>
                     <td data-label="- Withdrawal" style="color: #c62828;">${toIndianCurrency(currentExpense)}</td>
@@ -531,28 +482,77 @@
                 `;
                 tableBody.appendChild(row);
 
+                // Add to Graph Data
+                labels.push("Year " + year);
+                dataPoints.push(Math.max(0, closing));
+
                 currentBalance = closing;
             }
 
             document.getElementById('tableContainer').style.display = 'block';
             document.getElementById('tableContainer').scrollIntoView({behavior: "smooth"});
+
+            // RENDER CHART
+            renderChart(labels, dataPoints);
         }
 
-        function downloadPDF() {
-            // Ensure schedule is visible for the PDF, otherwise it might print empty if user hasn't clicked 'View'
-            showSchedule(); 
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('corpusChart').getContext('2d');
+            
+            // Destroy previous chart if exists
+            if (myChart) {
+                myChart.destroy();
+            }
 
-            const element = document.getElementById('printableArea');
-            const opt = {
-                margin:       [10, 10, 10, 10], // top, left, bottom, right
-                filename:     'Retirement_Plan.pdf',
-                image:        { type: 'jpeg', quality: 0.3 },
-                html2canvas:  { scale: 3 }, // Higher scale = better quality
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            // Buttons are hidden automatically via data-html2canvas-ignore="true" attributes in HTML
-            html2pdf().set(opt).from(element).save();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Corpus Balance',
+                        data: data,
+                        borderColor: '#2e7d32', // Green line
+                        backgroundColor: 'rgba(46, 125, 50, 0.1)', // Light green fill
+                        fill: true,
+                        tension: 0.4, // Smooth curve
+                        pointRadius: 2,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.parsed.y;
+                                    return toIndianCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    // Shorten large numbers for Y-axis (e.g. 1Cr)
+                                    if(value >= 10000000) return '₹' + (value/10000000).toFixed(1) + 'Cr';
+                                    if(value >= 100000) return '₹' + (value/100000).toFixed(1) + 'L';
+                                    return value;
+                                },
+                                font: { family: 'Roboto' }
+                            }
+                        },
+                        x: {
+                            ticks: { font: { family: 'Roboto' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
         }
     </script>
 </body>
