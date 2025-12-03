@@ -4,11 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retirement Calculator (India)</title>
+    
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- PDF LIBRARY -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
+        /* BASE STYLES */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f0f2f5;
-            padding: 40px 20px;
+            padding: 20px;
             margin: 0;
             color: #333;
         }
@@ -24,91 +34,191 @@
 
         h2 {
             text-align: center;
-            color: #1b5e20; /* Dark Green Title */
-            margin-bottom: 2rem;
+            color: #1b5e20;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
         }
 
+        /* TOGGLE SWITCH STYLES */
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            margin: 0 8px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2e7d32;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* INPUT GRID */
         .grid-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        @media (max-width: 600px) {
-            .grid-inputs { grid-template-columns: 1fr; }
-        }
-
         .input-group {
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 600;
+            font-weight: 500;
             color: #555;
             font-size: 0.9rem;
         }
 
-        input {
+        input[type="number"] {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 1rem;
+            font-family: 'Roboto', sans-serif;
             box-sizing: border-box;
             transition: border 0.3s;
+            -webkit-appearance: none;
         }
 
-        input:focus {
-            border-color: #43a047; /* Green focus */
+        input[type="number"]:focus {
+            border-color: #43a047;
             outline: none;
         }
 
-        /* PRIMARY BUTTON (NOW GREEN) */
+        /* ACTION BUTTONS GRID */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 3fr 1fr; /* Calculate is bigger */
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+
         .btn-primary {
             width: 100%;
-            padding: 15px;
-            background-color: #2e7d32; /* Rich Forest Green */
+            padding: 16px;
+            background-color: #2e7d32;
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 1rem;
             transition: background 0.3s;
             box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
         }
 
-        .btn-primary:hover {
-            background-color: #1b5e20; /* Darker Green on Hover */
+        .btn-primary:hover { background-color: #1b5e20; }
+
+        .btn-reset {
+            width: 100%;
+            padding: 16px;
+            background-color: #eceff1;
+            color: #546e7a;
+            border: 1px solid #cfd8dc;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        /* SECONDARY BUTTON (Lighter Green) */
+        .btn-reset:hover { background-color: #cfd8dc; color: #37474f; }
+
+        /* RESULT AREA BUTTONS */
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
         .btn-secondary {
-            background-color: #43a047; 
+            background-color: #43a047;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 6px;
             font-size: 1rem;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: 1rem;
-            display: none; /* Hidden by default */
-            margin-left: auto;
-            margin-right: auto;
+            transition: background 0.2s;
         }
         
-        .btn-secondary:hover {
-            background-color: #2e7d32;
+        .btn-secondary:hover { background-color: #2e7d32; }
+
+        .btn-pdf {
+            background-color: #d32f2f; /* Red for PDF */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        /* Result Section */
+        .btn-pdf:hover { background-color: #b71c1c; }
+
+        /* RESULT BOX */
         .result-box {
             margin-top: 2rem;
-            padding: 2rem;
-            background-color: #e8f5e9; /* Light Green Background */
+            padding: 1.5rem;
+            background-color: #e8f5e9;
             border-radius: 10px;
             text-align: center;
             border: 1px solid #c8e6c9;
@@ -117,16 +227,17 @@
 
         .result-value {
             font-size: 2.2rem;
-            font-weight: 800;
-            color: #2e7d32; /* Matching Green Text */
+            font-weight: 700;
+            color: #2e7d32;
             display: block;
             margin-top: 10px;
+            word-wrap: break-word;
+            font-variant-numeric: tabular-nums; 
         }
 
-        /* Table Section */
+        /* TABLE SECTION */
         .table-container {
             margin-top: 2rem;
-            overflow-x: auto;
             display: none; 
             animation: fadeIn 0.5s;
         }
@@ -134,34 +245,94 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         th {
-            background-color: #1b5e20; /* Dark Green Header */
+            background-color: #1b5e20;
             color: white;
             padding: 12px;
             text-align: right;
+            font-weight: 500;
         }
-        
         th:first-child { text-align: center; }
 
         td {
-            padding: 12px;
+            padding: 14px 12px;
             border-bottom: 1px solid #eee;
             text-align: right;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 600;
+            font-family: 'Roboto', sans-serif; 
+            font-variant-numeric: tabular-nums; 
+            font-weight: 400;
+            color: #333;
         }
         
         td:first-child { 
             text-align: center; 
-            font-family: sans-serif;
-            color: #7f8c8d;
+            font-weight: 700;
+            color: #555;
         }
 
-        tr:nth-child(even) { background-color: #f1f8e9; } /* Very light green tint for rows */
-        
+        tr:nth-child(even) { background-color: #f9fbe7; }
+
+        /* MOBILE RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 1.5rem 1rem; }
+            .grid-inputs { grid-template-columns: 1fr; gap: 10px; }
+            
+            /* Stack buttons on mobile */
+            .action-buttons { grid-template-columns: 1fr; }
+            .result-actions { flex-direction: column; }
+            .btn-secondary, .btn-pdf { width: 100%; }
+
+            h2 { font-size: 1.5rem; }
+            .result-value { font-size: 1.8rem; }
+
+            /* Card View for Mobile Table */
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            
+            tr { 
+                margin-bottom: 1rem; 
+                border: 1px solid #c8e6c9;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+
+            td:first-child {
+                background-color: #e8f5e9;
+                color: #1b5e20;
+                text-align: left;
+                padding: 10px 15px;
+                border-bottom: 1px solid #c8e6c9;
+                font-weight: 700;
+            }
+            
+            td { 
+                border: none;
+                border-bottom: 1px solid #eee; 
+                position: relative;
+                padding-left: 50%; 
+                text-align: right;
+            }
+
+            td:last-child { border-bottom: none; }
+
+            td::before { 
+                position: absolute;
+                top: 14px;
+                left: 15px;
+                width: 45%; 
+                white-space: nowrap;
+                text-align: left;
+                font-weight: 500;
+                color: #777;
+                content: attr(data-label);
+            }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -170,12 +341,22 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="printableArea">
         <h2>Retirement Corpus Calculator</h2>
         
         <div class="grid-inputs">
             <div class="input-group">
-                <label>Yearly Expenses (After Tax)</label>
+                <div class="expense-header">
+                    <label id="expenseLabel" style="margin:0;">Yearly Expenses (After Tax)</label>
+                    <div class="toggle-container">
+                        Yearly
+                        <label class="switch">
+                            <input type="checkbox" id="expenseToggle" onchange="toggleExpenseMode()">
+                            <span class="slider"></span>
+                        </label>
+                        Monthly
+                    </div>
+                </div>
                 <input type="number" id="expense" placeholder="e.g. 1200000"> 
             </div>
 
@@ -195,14 +376,20 @@
             </div>
         </div>
 
-        <button class="btn-primary" onclick="calculateCorpus()">Calculate Corpus</button>
+        <div class="action-buttons" data-html2canvas-ignore="true">
+            <button class="btn-primary" onclick="calculateCorpus()">Calculate Corpus</button>
+            <button class="btn-reset" onclick="resetForm()">Reset</button>
+        </div>
 
         <div id="resultBox" class="result-box">
             <span>You require a retirement corpus of:</span>
             <span id="outputValue" class="result-value">₹0</span>
             <div style="margin-top: 5px; font-size: 0.9em; color: #558b2f;" id="outputWords"></div>
             
-            <button id="showScheduleBtn" class="btn-secondary" onclick="showSchedule()">View Year-wise Schedule</button>
+            <div class="result-actions" data-html2canvas-ignore="true">
+                <button id="showScheduleBtn" class="btn-secondary" onclick="showSchedule()">View Schedule</button>
+                <button id="downloadPdfBtn" class="btn-pdf" onclick="downloadPDF()">Download Report</button>
+            </div>
         </div>
 
         <div id="tableContainer" class="table-container">
@@ -221,13 +408,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                    <!-- JS will insert rows here -->
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
         let globalExpense, globalT, globalR, globalI, globalCorpus;
+        let isMonthlyMode = false;
 
         function toIndianCurrency(num) {
             return num.toLocaleString('en-IN', {
@@ -237,40 +426,72 @@
             });
         }
 
-        function calculateCorpus() {
-            // 1. Reset Views
-            document.getElementById('tableContainer').style.display = 'none';
-            document.getElementById('showScheduleBtn').style.display = 'none';
+        function toggleExpenseMode() {
+            const toggle = document.getElementById('expenseToggle');
+            const label = document.getElementById('expenseLabel');
+            const input = document.getElementById('expense');
+            
+            isMonthlyMode = toggle.checked;
 
-            // 2. Get Inputs
-            globalExpense = parseFloat(document.getElementById('expense').value);
+            if (isMonthlyMode) {
+                label.innerText = "Monthly Expenses (After Tax)";
+                input.placeholder = "e.g. 100000";
+            } else {
+                label.innerText = "Yearly Expenses (After Tax)";
+                input.placeholder = "e.g. 1200000";
+            }
+        }
+
+        function resetForm() {
+            // Clear inputs
+            document.getElementById('expense').value = '';
+            document.getElementById('years').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('inflation').value = '6'; // Default back to 6
+            
+            // Reset Toggle
+            document.getElementById('expenseToggle').checked = false;
+            toggleExpenseMode(); // Reset text to Yearly
+
+            // Hide results
+            document.getElementById('resultBox').style.display = 'none';
+            document.getElementById('tableContainer').style.display = 'none';
+            
+            // Clear table
+            document.querySelector('#breakdownTable tbody').innerHTML = '';
+        }
+
+        function calculateCorpus() {
+            // Hide previous results first
+            document.getElementById('tableContainer').style.display = 'none';
+
+            let rawExpense = parseFloat(document.getElementById('expense').value);
             globalT = parseFloat(document.getElementById('years').value);
             const rPercent = parseFloat(document.getElementById('rate').value);
             const iPercent = parseFloat(document.getElementById('inflation').value);
 
-            if (isNaN(globalExpense) || isNaN(globalT) || isNaN(rPercent) || isNaN(iPercent)) {
+            if (isNaN(rawExpense) || isNaN(globalT) || isNaN(rPercent) || isNaN(iPercent)) {
                 alert("Please enter valid numbers in all fields.");
                 return;
             }
 
+            // Convert Monthly to Yearly if toggle is checked
+            globalExpense = isMonthlyMode ? rawExpense * 12 : rawExpense;
+
             globalR = rPercent / 100;
             globalI = iPercent / 100;
 
-            // 3. Validate
             if (Math.abs((1 + globalR) - (1 + globalI)) < 0.00001) {
                 alert("Return Rate and Inflation Rate cannot be exactly the same.");
                 return;
             }
 
-            // 4. Calculate Corpus
             const numerator = globalExpense * (1 - Math.pow((1 + globalI) / (1 + globalR), globalT));
             const denominator = (1 + globalR) - (1 + globalI);
             globalCorpus = numerator / denominator;
 
-            // 5. Display Result
             document.getElementById('outputValue').innerText = toIndianCurrency(globalCorpus);
             
-            // Helper text for Crores/Lakhs
             let wordText = "";
             if(globalCorpus >= 10000000) {
                 wordText = `(Approx. ${(globalCorpus/10000000).toFixed(2)} Crores)`;
@@ -280,7 +501,6 @@
             document.getElementById('outputWords').innerText = wordText;
 
             document.getElementById('resultBox').style.display = 'block';
-            document.getElementById('showScheduleBtn').style.display = 'inline-block';
         }
 
         function showSchedule() {
@@ -292,26 +512,22 @@
 
             for (let year = 1; year <= globalT; year++) {
                 const opening = currentBalance;
-                
-                // Growth
                 const growth = opening * globalR;
                 
-                // Expense logic
                 if (year > 1) {
                     currentExpense = currentExpense * (1 + globalI);
                 }
 
-                // Balance
                 const closing = opening + growth - currentExpense;
 
-                // Create Row
                 const row = document.createElement('tr');
+                
                 row.innerHTML = `
-                    <td>${year}</td>
-                    <td>${toIndianCurrency(opening)}</td>
-                    <td style="color: #2e7d32;">${toIndianCurrency(growth)}</td>
-                    <td style="color: #c62828;">${toIndianCurrency(currentExpense)}</td>
-                    <td style="font-weight:bold;">${toIndianCurrency(Math.max(0, closing))}</td>
+                    <td data-label="Year">${year}</td>
+                    <td data-label="Opening Balance">${toIndianCurrency(opening)}</td>
+                    <td data-label="+ Return" style="color: #2e7d32;">${toIndianCurrency(growth)}</td>
+                    <td data-label="- Withdrawal" style="color: #c62828;">${toIndianCurrency(currentExpense)}</td>
+                    <td data-label="Closing Balance" style="font-weight:700;">${toIndianCurrency(Math.max(0, closing))}</td>
                 `;
                 tableBody.appendChild(row);
 
@@ -320,6 +536,23 @@
 
             document.getElementById('tableContainer').style.display = 'block';
             document.getElementById('tableContainer').scrollIntoView({behavior: "smooth"});
+        }
+
+        function downloadPDF() {
+            // Ensure schedule is visible for the PDF, otherwise it might print empty if user hasn't clicked 'View'
+            showSchedule(); 
+
+            const element = document.getElementById('printableArea');
+            const opt = {
+                margin:       [10, 10, 10, 10], // top, left, bottom, right
+                filename:     'Retirement_Plan.pdf',
+                image:        { type: 'jpeg', quality: 0.3 },
+                html2canvas:  { scale: 3 }, // Higher scale = better quality
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Buttons are hidden automatically via data-html2canvas-ignore="true" attributes in HTML
+            html2pdf().set(opt).from(element).save();
         }
     </script>
 </body>
