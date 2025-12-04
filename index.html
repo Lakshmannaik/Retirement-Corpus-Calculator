@@ -249,7 +249,7 @@
             h2 { font-size: 1.5rem; }
             .result-value { font-size: 1.8rem; }
             
-            .chart-wrapper { height: 250px; } /* Smaller chart on mobile */
+            .chart-wrapper { height: 250px; }
 
             /* Card View for Mobile */
             table, thead, tbody, th, td, tr { display: block; }
@@ -312,8 +312,13 @@
             </div>
 
             <div class="input-group">
-                <label>Years of Retirement (t)</label>
-                <input type="number" id="years" placeholder="e.g. 25">
+                <label>Retirement Age</label>
+                <input type="number" id="retirementAge" placeholder="e.g. 60">
+            </div>
+
+            <div class="input-group">
+                <label>Life Expectancy (Age)</label>
+                <input type="number" id="lifeExpectancy" placeholder="e.g. 85">
             </div>
 
             <div class="input-group">
@@ -363,7 +368,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>
@@ -397,7 +402,11 @@
 
         function resetForm() {
             document.getElementById('expense').value = '';
-            document.getElementById('years').value = '';
+            
+            // CHANGED: Reset new age inputs
+            document.getElementById('retirementAge').value = '';
+            document.getElementById('lifeExpectancy').value = '';
+            
             document.getElementById('rate').value = '';
             document.getElementById('inflation').value = '6';
             document.getElementById('expenseToggle').checked = false;
@@ -414,15 +423,28 @@
 
         function calculateCorpus() {
             document.getElementById('tableContainer').style.display = 'none';
+            
             let rawExpense = parseFloat(document.getElementById('expense').value);
-            globalT = parseFloat(document.getElementById('years').value);
             const rPercent = parseFloat(document.getElementById('rate').value);
             const iPercent = parseFloat(document.getElementById('inflation').value);
 
-            if (isNaN(rawExpense) || isNaN(globalT) || isNaN(rPercent) || isNaN(iPercent)) {
+            // CHANGED: Fetch Ages
+            const retAge = parseFloat(document.getElementById('retirementAge').value);
+            const lifeExp = parseFloat(document.getElementById('lifeExpectancy').value);
+
+            if (isNaN(rawExpense) || isNaN(retAge) || isNaN(lifeExp) || isNaN(rPercent) || isNaN(iPercent)) {
                 alert("Please enter valid numbers in all fields.");
                 return;
             }
+
+            // CHANGED: Validation logic for Age
+            if (retAge >= lifeExp) {
+                alert("Life Expectancy must be greater than Retirement Age.");
+                return;
+            }
+
+            // CHANGED: Calculate globalT (Years of Retirement)
+            globalT = lifeExp - retAge;
 
             globalExpense = isMonthlyMode ? rawExpense * 12 : rawExpense;
             globalR = rPercent / 100;
